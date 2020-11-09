@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.gabrigiunchi</groupId>
-    <artifactId>demo-hateoas</artifactId>
+    <artifactId>demo-spring-hateoas</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>demo-hateoas</name>
+    <name>demo-spring-hateoas</name>
     <description>Demo project for Spring HATEOAS</description>
 
     <properties>
