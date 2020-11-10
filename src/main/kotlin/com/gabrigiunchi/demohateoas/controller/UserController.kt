@@ -11,57 +11,68 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-data class ModifyNameRequest(val name: String)
+class ModifyNameRequest(val name: String)
+data class ModifyUserRequest(val id: String, val name: String, val surname: String)
 
 @RestController
 @RequestMapping("/users")
 class UserController(private val userService: UserService) {
 
     @GetMapping
-    fun getUsers(): CollectionModel<User> {
-        val users = this.userService.users
-        users.forEach {
+    fun getUsers(): ResponseEntity<CollectionModel<User>> {
+        val users = this.userService.users.map {
             it.add(linkTo<UserController> {
                 methodOn(UserController::class.java).getUserById(it.id)
             }.withSelfRel())
+            it
         }
-        return CollectionModel.of(users).add(linkTo<UserController> {
-            methodOn(UserController::class.java).getUsers()
-        }.withSelfRel())
+        return ResponseEntity.ok(
+            CollectionModel.of(users).add(linkTo<UserController> {
+                methodOn(UserController::class.java).getUsers()
+            }.withSelfRel())
+        )
     }
 
     @GetMapping("/{id}")
-    fun getUserById(@PathVariable id: String): EntityModel<User> {
+    fun getUserById(@PathVariable id: String): ResponseEntity<EntityModel<User>> {
         val user = this.userService.getUserById(id)
-        user.add(linkTo<UserController> {
-            methodOn(UserController::class.java).getUserById(id.toInt().plus(1).toString())
-        }.withRel("next"))
-
         val selfLink = linkTo<UserController> { methodOn(UserController::class.java).getUserById(id) }
             .withSelfRel()
             .andAffordance(afford<UserController> {
                 methodOn(UserController::class.java).modifyUserName(
                     id,
-                    EntityModel.of(ModifyNameRequest("gabriele"))
+                    ModifyNameRequest("gabriele")
                 )
             })
             .andAffordance(afford<UserController> {
-                methodOn(UserController::class.java).modifyUserName(
-                    id, EntityModel.of(
-                        ModifyNameRequest("francesco")
-                    )
-                )
+                methodOn(UserController::class.java).deleteUser(id)
             })
-        return EntityModel.of(user, selfLink)
+            .andAffordance(afford<UserController> {
+                methodOn(UserController::class.java).modifyUser(id, ModifyUserRequest("1", "gabriele", "giunchi"))
+            })
+        val next = linkTo<UserController> {
+            methodOn(UserController::class.java).getUserById(id.toInt().plus(1).toString())
+        }.withRel("next")
+        return ResponseEntity.ok(EntityModel.of(user, selfLink, next))
+    }
+
+    @PutMapping("/{id}")
+    fun modifyUser(@PathVariable id: String, @RequestBody request: ModifyUserRequest): ResponseEntity<User> {
+        val user = this.userService.getUserById(id)
+        user.add(
+            linkTo<UserController> {
+                methodOn(UserController::class.java).getUserById(id)
+            }.withSelfRel()
+                .andAffordance(afford<UserController> { methodOn(UserController::class.java).deleteUser(id) })
+        )
+
+        return ResponseEntity.ok(user)
     }
 
     @PatchMapping("/{id}")
-    fun modifyUserName(
-        @PathVariable id: String,
-        @RequestBody request: EntityModel<ModifyNameRequest>
-    ): ResponseEntity<User> {
+    fun modifyUserName(@PathVariable id: String, @RequestBody request: ModifyNameRequest): ResponseEntity<User> {
         val user = this.userService.getUserById(id)
-        user.name = request.content?.name ?: throw Exception("bad request")
+        user.name = request.name
         return ResponseEntity.ok(user)
     }
 
