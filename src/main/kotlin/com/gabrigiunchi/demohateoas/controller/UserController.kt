@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-class ModifyNameRequest(val name: String)
+data class ModifyNameRequest(val name: String)
 data class ModifyUserRequest(val id: String, val name: String, val surname: String)
 
 @RestController
