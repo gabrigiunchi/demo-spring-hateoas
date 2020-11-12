@@ -1,0 +1,11 @@
+{
+  "title": "create",
+  "method": "post",
+  "content-type": "application/json",
+  "properties": [
+    {
+      "name": "variable1",
+      "required": false
+    }
+  ]
+}
