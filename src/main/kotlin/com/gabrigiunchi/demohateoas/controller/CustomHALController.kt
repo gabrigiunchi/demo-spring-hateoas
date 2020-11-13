@@ -30,8 +30,8 @@ class ResponseResource(
 
 
 @RestController
-@RequestMapping("/playground")
-class PlaygroundController {
+@RequestMapping("/custom")
+class CustomHALController {
 
     @GetMapping("/resource")
     fun getResource(): ResponseEntity<HALResource> {
@@ -39,12 +39,12 @@ class PlaygroundController {
             id = 1,
             name = "resource1",
             _links = mapOf(
-                linkTo<PlaygroundController> {
-                    methodOn(PlaygroundController::class.java).getCollection()
+                linkTo<CustomHALController> {
+                    methodOn(CustomHALController::class.java).getCollection()
                 }.withSelfRel().toPair(),
 
-                linkTo<PlaygroundController> {
-                    methodOn(PlaygroundController::class.java).getCollection()
+                linkTo<CustomHALController> {
+                    methodOn(CustomHALController::class.java).getCollection()
                 }.withRel("next").toPair()
 
             ),
@@ -59,12 +59,12 @@ class PlaygroundController {
     fun getCollection(): ResponseEntity<HALCollection> {
         val result = ResponseCollection(
             _links = mapOf(
-                linkTo<PlaygroundController> {
-                    methodOn(PlaygroundController::class.java).getCollection()
+                linkTo<CustomHALController> {
+                    methodOn(CustomHALController::class.java).getCollection()
                 }.withSelfRel().toPair(),
 
-                linkTo<PlaygroundController> {
-                    methodOn(PlaygroundController::class.java).getCollection()
+                linkTo<CustomHALController> {
+                    methodOn(CustomHALController::class.java).getCollection()
                 }.withRel("next").toPair()
 
             ),
@@ -77,8 +77,8 @@ class PlaygroundController {
                         id = it,
                         name = "resource$it",
                         _links = mapOf(
-                            linkTo<PlaygroundController> {
-                                methodOn(PlaygroundController::class.java).getCollection()
+                            linkTo<CustomHALController> {
+                                methodOn(CustomHALController::class.java).getCollection()
                             }.withSelfRel().toPair()
                         )
                     )
