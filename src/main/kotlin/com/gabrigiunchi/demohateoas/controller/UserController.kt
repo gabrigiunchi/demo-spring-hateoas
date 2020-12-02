@@ -3,7 +3,6 @@ package com.gabrigiunchi.demohateoas.controller
 import com.gabrigiunchi.demohateoas.model.User
 import com.gabrigiunchi.demohateoas.service.UserService
 import org.springframework.hateoas.CollectionModel
-import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn
 import org.springframework.hateoas.server.mvc.afford
 import org.springframework.hateoas.server.mvc.linkTo
@@ -34,7 +33,7 @@ class UserController(private val userService: UserService) {
     }
 
     @GetMapping("/{id}")
-    fun getUserById(@PathVariable id: String): ResponseEntity<EntityModel<User>> {
+    fun getUserById(@PathVariable id: String): ResponseEntity<User> {
         val user = this.userService.getUserById(id)
         val selfLink = linkTo<UserController> { methodOn(UserController::class.java).getUserById(id) }
             .withSelfRel()
@@ -53,7 +52,7 @@ class UserController(private val userService: UserService) {
         val next = linkTo<UserController> {
             methodOn(UserController::class.java).getUserById(id.toInt().plus(1).toString())
         }.withRel("next")
-        return ResponseEntity.ok(EntityModel.of(user, selfLink, next))
+        return ResponseEntity.ok(user.add(selfLink, next))
     }
 
     @PutMapping("/{id}")
