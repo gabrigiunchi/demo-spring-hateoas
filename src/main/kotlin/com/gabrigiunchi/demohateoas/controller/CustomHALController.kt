@@ -49,7 +49,18 @@ class CustomHALController {
 
             ),
             _templates = mapOf(
-                ResourceLoader.loadJSON<HALTemplate>("$TEMPLATES_FOLDER/resource.json").toPair()
+                ResourceLoader.loadJSON<HALTemplate>("$TEMPLATES_FOLDER/resource.json")
+                    .addLink(
+                        linkTo<CustomHALController> {
+                            methodOn(CustomHALController::class.java).getResource()
+                        }.withSelfRel()
+                    )
+                    .addLink(
+                        linkTo<CustomHALController> {
+                            methodOn(CustomHALController::class.java).getCollection()
+                        }.withRel("collection")
+                    )
+                    .toPair()
             )
         )
         return ResponseEntity.ok(result)
